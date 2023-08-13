@@ -32,12 +32,16 @@ passport.use(require('./src/configs/passport_local_strategy'));
 app.use(passport.initialize());
 app.use(passport.session());
 
+
+//EJS config
 app.use(expressLayouts);
 app.set("layout extractStyles", true);
 app.set("layout extractScripts", true);
-
 app.set('view engine', 'ejs');
 app.set("views", path.join(__dirname, "src", "views"));
+
+//Serving static files
+app.use(express.static('./src/static'))
 
 app.use('/', require('./src/routes'));
 

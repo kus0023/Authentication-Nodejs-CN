@@ -1,22 +1,11 @@
 const router = require('express').Router();
 
-router.get('/', function(req, res){
-    return res.redirect('/signin');
-})
+router.use('/', require('./home'))
 
-router.get('/signin', function(req, res){
+router.use('/signin', require('./signin.js'))
 
-    return res.render('signin');
-})
+router.use('/signup', require('./signup'))
 
-router.get('/signup', function(req, res){
-
-    return res.render('signup');
-})
-
-router.get('/forget-password', function(req, res){
-
-    return res.render('forget_password');
-})
+router.use('/forget-password', require('./forget_password'))
 
 module.exports = router;
