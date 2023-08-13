@@ -1,0 +1,33 @@
+{
+  "name": "authentication-nodejs-cn",
+  "version": "1.0.0",
+  "description": "Authentication starter project",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kus0023/Authentication-Nodejs-CN.git"
+  },
+  "keywords": [
+    "authentication",
+    "postman",
+    "mongodb",
+    "jwt"
+  ],
+  "author": "Kumar Utsav Singh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kus0023/Authentication-Nodejs-CN/issues"
+  },
+  "homepage": "https://github.com/kus0023/Authentication-Nodejs-CN#readme",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-ejs-layouts": "^2.5.1",
+    "express-validation": "^4.1.0"
+  }
+}
