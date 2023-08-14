@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const expressSession = require('express-session');
 const passport = require('passport');
+const flash = require('connect-flash');
 
 require('dotenv').config()
 
@@ -22,15 +23,20 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressSession({
     secret: process.env.EXPRESS_SESSION_SECRETE,
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: true }
+    resave: true,
+    saveUninitialized: true,
+    // cookie: { secure: true }
 }));
 
 //Initialize all the strategy of passport
 passport.use(require('./src/configs/passport_local_strategy'));
 app.use(passport.initialize());
 app.use(passport.session());
+
+//flash messages
+app.use(flash());
+app.use(require('./src/configs/midlewares').flashMiddleware);
+
 
 
 //EJS config

@@ -1,6 +1,8 @@
 const router = require('express').Router();
 
-router.get('/', function(req, res){
+const passport = require('passport');
+
+router.get('/', passport.checkAuthentication, function(req, res){
 
     return res.render('home');
 })

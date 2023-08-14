@@ -14,8 +14,11 @@ const localStrategy = new LocalStrategy({
         const user = await User.findOne({ email: email });
 
         if (!user || user.password != password) {
-            console.log("Invalid username/password");
-            return done(null, false, {type:'failure', message: "Invalid username/password"});
+            // console.log("Invalid username/password");
+
+            req.flash('message_flash', {type: 'failure', message: "Invalid username/password"})
+
+            return done(null, false, { type: 'failure', message: "Invalid username/password"});
         }
 
         req.flash('success', 'Successfully Logged in.');
@@ -30,7 +33,7 @@ const localStrategy = new LocalStrategy({
 
 });
 
-passport.use(localStrategy);
+// passport.use(localStrategy);
 
 
 //serializing the user to decide which key to keep in cookie
@@ -41,7 +44,7 @@ passport.serializeUser(function (user, done) {
 
 //deserializing the user from the key in the cookie.
 
-passport.deserializeUser( async function (id, done) {
+passport.deserializeUser(async function (id, done) {
     try {
 
         //Find a user and establish the identity
@@ -60,47 +63,47 @@ passport.deserializeUser( async function (id, done) {
 });
 
 
-passport.checkAuthentication = function (req, res, next){
+passport.checkAuthentication = function (req, res, next) {
 
-    if(req.isAuthenticated()){
+    if (req.isAuthenticated()) {
         return next();
     }
 
-    return res.redirect('/users/sign-in');
+    return res.redirect('/signin');
 }
 
-passport.setAuthenticatedUser = function (req, res, next){
+passport.setAuthenticatedUser = function (req, res, next) {
 
-    if(req.isAuthenticated()){
+    if (req.isAuthenticated()) {
 
         res.locals.user = req.user;
         res.locals.user.password = undefined;
     }
-    
+
     return next();
 }
 
-passport.checkAlreadyLoggedIn = function (req, res, next){
+passport.checkAlreadyLoggedIn = function (req, res, next) {
 
-    if(!req.isAuthenticated()){
+    if (!req.isAuthenticated()) {
         return next();
     }
 
     return res.redirect('/');
 }
 
-passport.logoutUser = function (req, res, next){
+passport.logoutUser = function (req, res, next) {
 
-    if(req.isAuthenticated()){
-       
-        req.logout(function(err) {
+    if (req.isAuthenticated()) {
+
+        req.logout(function (err) {
             if (err) {
                 req.flash('failure', 'Logout Attempt failed.');
-                return next(err); 
+                return next(err);
             }
             req.flash('warning', 'Logged out successfully.');
             return res.redirect('/');
-          });
+        });
     }
 }
 
