@@ -38,7 +38,8 @@ passport.use(require('./src/configs/passport_local_strategy'));
 app.use(passport.initialize());
 app.use(passport.session());
 
-
+//setting up the user in req if authenticated.
+app.use(passport.setAuthenticatedUser)
 
 
 
@@ -54,6 +55,8 @@ app.use(express.static('./src/static'))
 
 app.use('/', require('./src/routes'));
 
+
+//Global validation error handler function.
 app.use(function (err, req, res, next) {
     if (err instanceof ValidationError) {
 

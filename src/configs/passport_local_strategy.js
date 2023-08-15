@@ -22,7 +22,7 @@ const localStrategy = new LocalStrategy({
             return done(null, false);
         
         }
-        req.flash('message_flash', {type: 'failure', message: "Invalid password"})
+        
         req.flash('message_flash', {type: 'success', message: "Logged in"});
 
         user.password = undefined;
@@ -70,6 +70,8 @@ passport.checkAuthentication = function (req, res, next) {
     if (req.isAuthenticated()) {
         return next();
     }
+
+    req.flash('message_flash', {type: 'failure', message: 'Please login first'})
 
     return res.redirect('/signin');
 }

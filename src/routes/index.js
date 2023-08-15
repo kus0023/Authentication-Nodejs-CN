@@ -9,4 +9,6 @@ router.use('/signup', require('./signup'))
 
 router.use('/forget-password', require('./forget_password'))
 
+router.use('/logout', require('./signout'))
+
 module.exports = router;
