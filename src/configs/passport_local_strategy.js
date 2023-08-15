@@ -13,15 +13,17 @@ const localStrategy = new LocalStrategy({
         //Find a user and establish the identity
         const user = await User.findOne({ email: email });
 
-        if (!user || user.password != password) {
+        
+        if ( !user || !User.isValid(password, user)) {
             // console.log("Invalid username/password");
 
             req.flash('message_flash', {type: 'failure', message: "Invalid username/password"})
 
-            return done(null, false, { type: 'failure', message: "Invalid username/password"});
+            return done(null, false);
+        
         }
-
-        req.flash('success', 'Successfully Logged in.');
+        req.flash('message_flash', {type: 'failure', message: "Invalid password"})
+        req.flash('message_flash', {type: 'success', message: "Logged in"});
 
         user.password = undefined;
         return done(null, user);

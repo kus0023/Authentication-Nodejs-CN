@@ -34,7 +34,8 @@
     "express-session": "^1.17.3",
     "express-validation": "^4.1.0",
     "mongoose": "^7.4.3",
-    "passport": "^0.6.0",
+    "passport": "^0.5.3",
+    "//": "passport --> v0.6.0 success flash is nor working. https://github.com/jaredhanson/passport/issues/918",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0"
   }

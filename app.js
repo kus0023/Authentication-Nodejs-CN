@@ -29,14 +29,16 @@ app.use(expressSession({
     // cookie: { secure: true }
 }));
 
+//flash messages
+app.use(flash());
+app.use(require('./src/configs/midlewares').flashMiddleware);
+
 //Initialize all the strategy of passport
 passport.use(require('./src/configs/passport_local_strategy'));
 app.use(passport.initialize());
 app.use(passport.session());
 
-//flash messages
-app.use(flash());
-app.use(require('./src/configs/midlewares').flashMiddleware);
+
 
 
 
@@ -60,6 +62,8 @@ app.use(function (err, req, res, next) {
         })
         return res.redirect('back')
     }
+
+    // console.log(typeof err, err);
    req.flash('message_flash', { type: 'failure', message: 'Something went wrong.'});
         
     return res.redirect('back');

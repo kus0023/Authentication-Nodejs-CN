@@ -28,10 +28,20 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     }
-}, {timestamps: true});
-
-userSchema.pre('save', async function (next, doc){
+},
+    {
+        timestamps: true,
+        statics: {
+            isValid(password, user) {
+                const isValid = bcrypt.compareSync(password, user.password);
     
+                return isValid;
+            }
+        },
+    });
+
+userSchema.pre('save', async function (next, doc) {
+
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(this.password, salt);
     this.password = hashedPassword;
