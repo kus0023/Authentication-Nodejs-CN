@@ -28,5 +28,24 @@ router.post('/',
     }),
 )
 
+/*********************Google Authentication*************************/
+//User will call it.
+router.get('/auth/google',
+    passport.authenticate('google', {
+        scope: ['profile', 'email']
+    }));
+
+
+//Google will call it
+router.get('/auth/google/callback',
+    passport.authenticate('google', {
+        failureRedirect: '/signin', failureFlash: true,
+        successFlash: true
+    }),
+    function (request, response) {
+        // Successful authentication, redirect home.
+
+        response.redirect('/');
+    });
 
 module.exports = router;

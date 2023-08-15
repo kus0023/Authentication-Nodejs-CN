@@ -35,6 +35,8 @@ app.use(require('./src/configs/midlewares').flashMiddleware);
 
 //Initialize all the strategy of passport
 passport.use(require('./src/configs/passport_local_strategy'));
+passport.use(require('./src/configs/passport_google_oauth'));
+
 app.use(passport.initialize());
 app.use(passport.session());
 

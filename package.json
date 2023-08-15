@@ -35,8 +35,7 @@
     "express-validation": "^4.1.0",
     "mongoose": "^7.4.3",
     "passport": "^0.5.3",
-    "//": "passport --> v0.6.0 success flash is nor working. https://github.com/jaredhanson/passport/issues/918",
-    "passport-jwt": "^4.0.1",
+    "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0"
   }
 }
