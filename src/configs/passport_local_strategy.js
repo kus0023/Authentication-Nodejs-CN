@@ -30,6 +30,7 @@ const localStrategy = new LocalStrategy({
 
     } catch (error) {
         console.log("Error in Passport: ", error);
+        req.flash('message_flash', {type: 'failure', message: "Logged in failed"});
         return done(error)
     }
 
