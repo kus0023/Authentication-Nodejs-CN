@@ -1,3 +1,49 @@
 <h1 class="text-center">Home page</h1>
 
-<a class="btn btn-danger" href="/logout">Logout</a>
+
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="card p-4" style="width: 60vw;">
+
+            <form method="post" action="/reset-password">
+                <!-- Email input -->
+                <div class="form-outline mb-4">
+                    <label class="form-label" for="form2Example1">Email address</label>
+                    <p id="form2Example1" class="form-control"><%=locals.email%></p>
+                </div>
+
+                <div class="text-center">
+                    <a class="btn btn-danger" href="/logout">Logout</a>
+                </div>
+
+                <br>
+
+                <h2>Change Password</h2>
+                <!-- Password input -->
+                <div class="form-outline mb-4">
+                    <input type="password" name="existing_password" id="existing_password" class="form-control" />
+                    <label class="form-label" for="existing_password">Current Password</label>
+                </div>
+
+                 <!-- Password input -->
+                 <div class="form-outline mb-4">
+                    <input type="password" name="new_password" id="new_password" class="form-control" />
+                    <label class="form-label" for="new_password">New Password</label>
+                </div>
+
+                <!-- Password input -->
+                <div class="form-outline mb-4">
+                    <input type="password" name="confirm_password" id="confirm_password" class="form-control" />
+                    <label class="form-label" for="confirm_password">Confirm New Password</label>
+                </div>
+
+                <!-- Submit button -->
+                <div class="text-center">
+                    <button type="submit" class="btn-lg btn-primary btn-block mb-4">Change Password</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
