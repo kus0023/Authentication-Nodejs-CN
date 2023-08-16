@@ -93,4 +93,11 @@ router.post('/reset-password',
     })
 
 
+const authMailer = require('../mailers/auth_mailer');
+router.get('/sendmail', async function (req, res){
+    const mailRes = await authMailer.exampleMail({to: 'a@gmail.com'});
+
+    return res.status(200).json({message: 'success', mailRes})
+})
+
 module.exports = router;
