@@ -2,6 +2,7 @@ const router = require('express').Router();
 const passport = require('passport');
 const User = require('../models/User');
 const { validate, ValidationError, Joi } = require('express-validation');
+const jwt = require('jsonwebtoken');
 
 router.get('/', passport.checkAuthentication, function (req, res) {
 
@@ -9,6 +10,41 @@ router.get('/', passport.checkAuthentication, function (req, res) {
 
     return res.render('home', { firstName, secondName, email, userid: _id });
 });
+
+router.get('/verify', function (req, res) {
+
+    return res.render('verify_account')
+})
+
+router.get('/verify_account', async function (req, res) {
+    const { token } = req.query;
+
+    if (!token) {
+        return res.status(400).json({
+            message: 'Token is not present.'
+        });
+    }
+
+    try {
+
+        const payload = jwt.verify(token, process.env.JWT_SECRET);
+
+        const userDoc = await User.findOne({ email: payload.email });
+
+        if (userDoc) {
+            
+            await userDoc.updateOne({emailVerified: true});
+            return res.status(200).json({ message: "Account verify successfully." })
+        } else {
+            return res.status(404).json({ message: "Account not found" })
+        }
+
+    } catch (error) {
+        console.log(error.toString());
+        return res.status(500).json({ message: 'Internal server error. Try again later.' })
+    }
+
+})
 
 const resetPasswordValidate = {
     body: Joi.object({
@@ -45,9 +81,9 @@ router.post('/reset-password',
 
 
             if (userDoc) {
-                
+
                 //check the old password first
-                if(!User.isValid(existing_password, userDoc)){
+                if (!User.isValid(existing_password, userDoc)) {
                     req.flash('message_flash', { type: 'failure', message: 'Incorrect Password', delay: 10000 });
                     return res.redirect('back');
                 }
@@ -65,7 +101,7 @@ router.post('/reset-password',
             }
 
             req.flash('message_flash', { type: 'success', message: 'Password changed successfully.' });
-                    
+
             return res.redirect('back');
         } catch (error) {
             //Handling for any conflicts
@@ -92,12 +128,5 @@ router.post('/reset-password',
 
     })
 
-
-const authMailer = require('../mailers/auth_mailer');
-router.get('/sendmail', async function (req, res){
-    const mailRes = await authMailer.exampleMail({to: 'a@gmail.com'});
-
-    return res.status(200).json({message: 'success', mailRes})
-})
 
 module.exports = router;

@@ -69,8 +69,15 @@ passport.deserializeUser(async function (id, done) {
 passport.checkAuthentication = function (req, res, next) {
 
     if (req.isAuthenticated()) {
+        
+
+        if(req.user.emailVerified == false){
+            return res.redirect('/verify');
+        }
         return next();
     }
+
+    
 
     req.flash('message_flash', {type: 'failure', message: 'Please login first'})
 

@@ -33,6 +33,7 @@
     "express-ejs-layouts": "^2.5.1",
     "express-session": "^1.17.3",
     "express-validation": "^4.1.0",
+    "jsonwebtoken": "^9.0.1",
     "mongoose": "^7.4.3",
     "nodemailer": "^6.9.4",
     "passport": "^0.5.3",

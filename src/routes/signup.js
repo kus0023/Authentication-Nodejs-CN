@@ -1,6 +1,9 @@
 const router = require('express').Router();
 const { validate, ValidationError, Joi } = require('express-validation');
 
+const authMailer = require('../mailers/auth_mailer');
+const jwt = require('jsonwebtoken');
+
 const User = require('../models/User');
 const { MongooseError } = require('mongoose');
 
@@ -52,11 +55,41 @@ router.post('/',
         const { firstName, secondName, email, password } = req.body;
 
         try {
+            //send a confirmation mail with token to verify account
+            const token = jwt.sign({
+                email
+            }, process.env.JWT_SECRET, {algorithm: 'HS512', expiresIn: "100d"});
+
+            const fullUrl = `${req.protocol}://${req.headers.host}/verify_account?token=${token}`
+            
+            const mailRes = await authMailer.accountCreatedMail({
+                to: email,
+                firstName: firstName,
+                verificationUrl: fullUrl
+            })
+
+            if(mailRes){
+                req.flash('message_flash', {
+                    type: 'success',
+                    message: 'Mail sent. Please verify your account',
+                    delay: 30000
+                });
+            }else{
+                req.flash('message_flash', {
+                    type: 'failure',
+                    message: 'Could not send a mail.',
+                    delay: 30000
+                });
+            }
+
             const userDoc = await User.create({ firstName, secondName, email, password });
+
+            
             req.flash('message_flash', {
                 type: 'success',
                 message: 'Registration completed for email: ' + email
             });
+
             return res.redirect('/signin');
 
         } catch (error) {
