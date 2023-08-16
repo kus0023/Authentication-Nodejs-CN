@@ -23,7 +23,12 @@ const registerValidation = {
             .email()
             .required(),
         password: Joi.string()
-            .regex(/[a-zA-Z0-9]{3,30}/)
+            .min(8)
+            .max(30)
+            .required(),
+        confirmPassword: Joi.string()
+            .min(8)
+            .max(30)
             .required(),
     }),
 }
@@ -31,6 +36,13 @@ const registerValidation = {
 router.post('/',
     validate(registerValidation, {}, { keyByField: true, abortEarly: false }),
     async function (req, res) {
+
+        //check if password and confirm password is same
+        if(req.body.password != req.body.confirmPassword){
+
+            req.flash('message_flash', { type: 'failure', message: 'Password is not matching.', delay: 20000 });
+            return res.redirect('back');
+        }
 
         //Create the user
 
@@ -43,7 +55,7 @@ router.post('/',
             const userDoc = await User.create({ firstName, secondName, email, password });
             req.flash('message_flash', {
                 type: 'success',
-                message: 'Registration completed for email: '+email
+                message: 'Registration completed for email: ' + email
             });
             return res.redirect('/signin');
 
