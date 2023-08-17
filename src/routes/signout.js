@@ -1,10 +1,7 @@
 const router = require('express').Router();
 const passport = require('passport');
+const signoutController = require('../controllers/signout_controller');
 
-router.get('/', passport.checkAuthentication,function(req, res){
-    req.logOut();
-    req.flash('message_flash', {type: 'success', message: 'Logged out'})
-    return res.redirect('/signin');
-});
+router.get('/', passport.checkAuthentication, signoutController.signout);
 
 module.exports = router;
