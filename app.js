@@ -7,6 +7,7 @@ const expressSession = require('express-session');
 const passport = require('passport');
 const flash = require('connect-flash');
 const { validate, ValidationError, Joi } = require('express-validation');
+const MongoStore = require('connect-mongo');
 
 require('dotenv').config()
 
@@ -26,7 +27,14 @@ app.use(expressSession({
     secret: process.env.EXPRESS_SESSION_SECRETE,
     resave: true,
     saveUninitialized: true,
-    // cookie: { secure: true }
+    cookie: { 
+        maxAge: 1000 * 60 * 60 * 24, //1 day
+     },
+
+     //Storing session in DB so on server restart session will not lost.
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGO_DB_URL+process.env.MONGO_DB_SESSION_DB_NAME,
+      })
 }));
 
 //flash messages
