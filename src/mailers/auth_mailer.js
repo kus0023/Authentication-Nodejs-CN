@@ -49,3 +49,28 @@ exports.accountCreatedMail = async (mailData) => {
         return false;
     }
 }
+
+/**
+ * 
+ * @param   mailData to, firstName
+ * @returns mailObject or false
+ */
+exports.passwordResetMail = async (mailData) => {
+
+    let htmlString = nodemailer.renderTemplate({mailData}, 'password_reset_template.ejs');
+    try {
+        const res = await nodemailer.transporter.sendMail({
+            from: process.env.NODEMAILER_USER,
+            to: mailData.to,
+            subject: 'Password changed successsfully',
+            html: htmlString
+
+        });
+        
+        return res;
+    } catch (error) {
+
+        console.log("Mail cannot sent", error.toString());
+        return false;
+    }
+}

@@ -3,6 +3,7 @@ const passport = require('passport');
 const User = require('../models/User');
 const { validate, ValidationError, Joi } = require('express-validation');
 const jwt = require('jsonwebtoken');
+const authMailer = require('../mailers/auth_mailer');
 
 router.get('/', passport.checkAuthentication, function (req, res) {
 
@@ -79,6 +80,11 @@ router.post('/reset-password',
         try {
             const userDoc = await User.findById(req.user._id);
 
+            if(!userDoc){
+                req.flash('message_flash', { type: 'failure', message: 'User not found', delay: 10000 });
+                return res.redirect('back');
+            }
+
 
             if (userDoc) {
 
@@ -101,6 +107,13 @@ router.post('/reset-password',
             }
 
             req.flash('message_flash', { type: 'success', message: 'Password changed successfully.' });
+
+            //send a mail to user after changing the password
+            const mailresponse = await authMailer.passwordResetMail({
+                to: userDoc.email,
+                firstName: userDoc.firstName
+            });
+
 
             return res.redirect('back');
         } catch (error) {
