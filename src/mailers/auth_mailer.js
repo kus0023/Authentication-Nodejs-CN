@@ -74,3 +74,23 @@ exports.passwordResetMail = async (mailData) => {
         return false;
     }
 }
+
+exports.forgetPasswordMail = async (mailData) => {
+
+    let htmlString = nodemailer.renderTemplate({mailData}, 'forget_password_template.ejs');
+    try {
+        const res = await nodemailer.transporter.sendMail({
+            from: process.env.NODEMAILER_USER,
+            to: mailData.to,
+            subject: 'Reset your password',
+            html: htmlString
+
+        });
+        
+        return res;
+    } catch (error) {
+
+        console.log("Mail cannot sent", error.toString());
+        return false;
+    }
+}
