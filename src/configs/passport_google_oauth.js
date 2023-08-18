@@ -17,7 +17,7 @@ const googleAuth = new GoogleStrategy({
         password: googleRes.sub,
         emailVerified: googleRes.email_verified,
         firstName: googleRes.given_name,
-        secondName: googleRes.family_name
+        secondName: googleRes.family_name || "!" //If user's family name was not found on google.
     };
 
     try {
@@ -26,10 +26,16 @@ const googleAuth = new GoogleStrategy({
         
         if(!userDoc){
             //then create
-            console.log('User not found creating the new user');
+            // console.log('User not found creating the new user');
             userDoc = await User.create(googleUser);
-            console.log('user created successfully.');
+            // console.log('user created successfully.');
+        }else{
+            userDoc.emailVerified = true;
+            await userDoc.updateOne().exec()
         }
+
+        
+
         req.flash('message_flash', {type: 'success', message: 'Google login success'});
 
         cb(null, userDoc);

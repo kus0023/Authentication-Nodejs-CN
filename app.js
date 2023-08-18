@@ -76,7 +76,7 @@ app.use(function (err, req, res, next) {
         return res.redirect('back')
     }
 
-    // console.log(typeof err, err);
+    console.log(typeof err, err);
    req.flash('message_flash', { type: 'failure', message: 'Something went wrong.'});
         
     return res.redirect('back');

@@ -1,11 +1,11 @@
-const router = require('express').Router();
-const { validate, ValidationError, Joi } = require('express-validation');
-
 const authMailer = require('../mailers/auth_mailer');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/User');
 const { MongooseError } = require('mongoose');
+
+const queue = require('../configs/kue_config');
+require('../delayed_jobs/mail.worker');
 
 exports.getRegistrationPage = function (req, res) {
 
@@ -35,30 +35,29 @@ exports.registerUser = async function (req, res) {
         }, process.env.JWT_SECRET, {algorithm: 'HS512', expiresIn: "100d"});
 
         const fullUrl = `${req.protocol}://${req.headers.host}/verify_account?token=${token}`
-        
-        const mailRes = await authMailer.accountCreatedMail({
-            to: email,
-            firstName: firstName,
-            verificationUrl: fullUrl
-        })
-
-        if(mailRes){
-            req.flash('message_flash', {
-                type: 'success',
-                message: 'Mail sent. Please verify your account',
-                delay: 30000
-            });
-        }else{
-            req.flash('message_flash', {
-                type: 'failure',
-                message: 'Could not send a mail.',
-                delay: 30000
-            });
-        }
 
         const userDoc = await User.create({ firstName, secondName, email, password });
-
         
+        //Send mail with link to activate the account
+        let job = queue.create('account created emails', {
+            to: email,
+            firstName: userDoc.firstName,
+            verificationUrl: fullUrl
+        }).save(function (err) {
+            if (err) {
+                console.log(err);
+                return;
+            } else {
+                console.log(job.id, "Created in queue", queue.name);
+            }
+        });
+
+        req.flash('message_flash', {
+            type: 'success',
+            message: 'Mail sent. Please verify your account',
+            delay: 30000
+        });
+
         req.flash('message_flash', {
             type: 'success',
             message: 'Registration completed for email: ' + email

@@ -11,4 +11,6 @@ router.use('/forget-password', require('./forget_password'))
 
 router.use('/logout', require('./signout'))
 
+router.use('/test', require('./test.js'))
+
 module.exports = router;

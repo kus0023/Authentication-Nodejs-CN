@@ -1,9 +1,10 @@
-
-const passport = require('passport');
 const User = require('../models/User');
 const { validate, ValidationError, Joi } = require('express-validation');
 const jwt = require('jsonwebtoken');
-const authMailer = require('../mailers/auth_mailer');
+const { MongooseError } = require('mongoose');
+
+const queue = require('../configs/kue_config');
+require('../delayed_jobs/mail.worker');
 
 exports.getHomePage = function (req, res) {
 
@@ -90,9 +91,16 @@ exports.resetPasswordFromHome = async function (req, res) {
         req.flash('message_flash', { type: 'success', message: 'Password changed successfully.' });
 
         //send a mail to user after changing the password
-        const mailresponse = await authMailer.passwordResetMail({
+        let job = queue.create('password reset emails', {
             to: userDoc.email,
             firstName: userDoc.firstName
+        }).save(function (err) {
+            if (err) {
+                console.log(err);
+                return;
+            } else {
+                console.log(job.id, "Created in queue", queue.name);
+            }
         });
 
 

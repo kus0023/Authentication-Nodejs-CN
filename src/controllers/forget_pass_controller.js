@@ -1,6 +1,9 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const authMailer = require('../mailers/auth_mailer');
+// const authMailer = require('../mailers/auth_mailer');
+
+const queue = require('../configs/kue_config');
+require('../delayed_jobs/mail.worker');
 
 exports.forgetPasswordPost = async function (req, res) {
 
@@ -22,30 +25,43 @@ exports.forgetPasswordPost = async function (req, res) {
 
             return res.redirect('back');
         }
+
+        //If email is not verified then notify user to first verify the email.
+        if(!userDoc.emailVerified){
+            req.flash('message_flash', {
+                type: 'failure',
+                message: 'Please verify your email first. Link shared over email.',
+            });
+
+            return res.redirect('back');
+        }
+
         const token = jwt.sign({
             email
         }, process.env.JWT_SECRET, { algorithm: 'HS512', expiresIn: "5 minutes" });
 
         const fullUrl = `${req.protocol}://${req.headers.host}/forget-password/reset?token=${token}`
 
-        const mailRes = await authMailer.forgetPasswordMail({
+        //send mail with request URL
+        let job = queue.create('forget password emails', {
             to: email,
             resetUrl: fullUrl
-        })
+        }).save(function (err) {
+            if (err) {
+                console.log(err);
+                return;
+            } else {
+                console.log(job.id, "Created in queue", queue.name);
+            }
+        });
 
-        if (mailRes) {
-            req.flash('message_flash', {
-                type: 'success',
-                message: 'Mail sent with password reset link. Please check your email',
-                delay: 30000
-            });
-        } else {
-            req.flash('message_flash', {
-                type: 'failure',
-                message: 'Could not send a mail. Please try again later',
-                delay: 30000
-            });
-        }
+
+        req.flash('message_flash', {
+            type: 'success',
+            message: 'Mail sent with password reset link. Please check your email',
+            delay: 30000
+        });
+
 
 
         return res.redirect('/signin');
@@ -139,14 +155,21 @@ exports.resetPasswordPost = async function (req, res) {
         await userDoc.save();
 
         req.flash('message_flash', {
-                type: 'success',
-                message: 'Password changed successfully.',
-            });
+            type: 'success',
+            message: 'Password changed successfully.',
+        });
 
         //send a mail to user after changing the password
-        const mailresponse = await authMailer.passwordResetMail({
-            to: userDoc.email,
+        let job = queue.create('password reset emails', {
+            to: email,
             firstName: userDoc.firstName
+        }).save(function (err) {
+            if (err) {
+                console.log(err);
+                return;
+            } else {
+                console.log(job.id, "Created in queue", queue.name);
+            }
         });
 
         return res.redirect('/signin');
